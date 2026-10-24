@@ -1,0 +1,11 @@
+.env
+.env.*
+!.env.example
+.venv/
+__pycache__/
+.pytest_cache/
+.ruff_cache/
+# Bank tokens, raw transactions and your own ledger.toml live here: never commit them.
+state/
+data/
+.local/

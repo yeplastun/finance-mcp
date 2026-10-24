@@ -1,0 +1,10 @@
+# Banks allow about four unattended pulls per account a day; three leave room for a manual one.
+[Unit]
+Description=finance: sync at 08:00, 16:00 and 23:00 London time
+
+[Timer]
+OnCalendar=*-*-* 08,16,23:00:00 Europe/London
+Persistent=true
+
+[Install]
+WantedBy=timers.target

@@ -1,0 +1,83 @@
+# The finance MCP server (and mcpkit, its small shared toolkit): its own uv project, Python 3.14.
+[project]
+name = "finance-mcp"
+version = "0.1.0"
+description = "MCP server over a personal bank ledger in PostgreSQL"
+requires-python = ">=3.14"
+dependencies = [
+    "fastmcp>=4.0.3,<5",
+    "python-dotenv>=1.0",
+    "psycopg[binary]>=3.3.6",
+]
+
+[dependency-groups]
+dev = [
+    "basedpyright==1.40.1",
+    "pytest==9.1.1",
+    "pytest-asyncio==1.4.0",
+]
+
+[tool.uv]
+package = false
+required-version = ">=0.12.3"
+python-preference = "managed"
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+pythonpath = ["src"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py314"
+
+[tool.ruff.lint]
+select = [
+    "E",    # pycodestyle
+    "F",    # pyflakes
+    "I",    # import sorting
+    "UP",   # pyupgrade
+    "B",    # bugbear
+    "SIM",  # simplify
+    "ANN",  # missing annotations — the signatures are the documentation
+]
+ignore = [
+    "ANN401",  # Any is occasionally the honest type
+    "ANN002",  # *args on a variadic passthrough: `Any` documents nothing
+    "ANN003",  # likewise **kwargs
+    "B008",    # FastMCP tool defaults are evaluated once, deliberately
+    "E501",    # ruff format owns line length
+]
+
+[tool.ruff.lint.per-file-ignores]
+# Test helpers build throwaway stubs; annotating them adds noise, not clarity.
+"tests/*" = ["ANN"]
+
+[tool.basedpyright]
+# basedpyright defaults to "all", which is stricter than almost anyone runs.
+# "standard" catches real type errors without drowning them.
+typeCheckingMode = "standard"
+pythonVersion = "3.14"
+venvPath = "."
+venv = ".venv"
+include = ["src", "tests"]
+extraPaths = ["src"]
+
+# Enforced by ruff's ANN rules instead, which already exempt tests.
+reportMissingParameterType = false
+reportUnannotatedClassAttribute = false
+
+# Tests build deliberately-thin fakes (SimpleNamespace, lambdas) where the code
+# expects store rows. Structural mismatches there are expected; everything else
+# still applies, so a genuine mistake in a test is still caught.
+[[tool.basedpyright.executionEnvironments]]
+root = "tests"
+# An executionEnvironment resets the import root, so the package and the
+# conftest fakes both need to stay importable.
+extraPaths = ["src", "tests"]
+reportArgumentType = false
+reportOptionalMemberAccess = false
+reportAttributeAccessIssue = false
+reportOptionalOperand = false
+reportOptionalIterable = false
+reportCallIssue = false

@@ -1,0 +1,47 @@
+# The sync service: TrueLayer transaction collection into the `ledger` schema. Its own uv project.
+[project]
+name = "finance"
+version = "0.1.0"
+description = "Bank transactions through TrueLayer (Open Banking AIS) into a PostgreSQL ledger"
+requires-python = ">=3.14,<3.15"
+dependencies = [
+    "httpx>=0.28,<1",
+    "openpyxl>=3.1,<4",
+    "psycopg[binary]==3.3.6",
+    "python-dotenv>=1.1,<2",
+]
+
+[dependency-groups]
+dev = [
+    "basedpyright==1.40.1",
+    "pytest==9.1.1",
+]
+
+[tool.uv]
+package = false
+required-version = ">=0.12.3"
+python-preference = "managed"
+# Supply-chain quarantine: no package released in the last two weeks.
+exclude-newer = "14 days"
+
+[tool.pytest]
+testpaths = ["tests"]
+pythonpath = ["."]
+addopts = ["-ra", "--strict-markers", "--strict-config"]
+xfail_strict = true
+
+[tool.basedpyright]
+typeCheckingMode = "standard"
+pythonVersion = "3.14"
+venvPath = "."
+venv = ".venv"
+include = ["finance", "tests"]
+exclude = ["**/__pycache__", "**/.*"]
+reportMissingTypeStubs = false
+reportOptionalSubscript = false
+reportOptionalMemberAccess = false
+# Tests pass fakes for real collaborators.
+executionEnvironments = [
+  { root = "tests", extraPaths = ["."], reportArgumentType = false, reportAttributeAccessIssue = false },
+  { root = "." },
+]

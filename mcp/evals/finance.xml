@@ -1,0 +1,46 @@
+<!--
+  Questions over the synthetic ledger (tests/finance_fixture.py; today is 2026-10-12), each with one
+  verifiable answer. Run with evals/finance_server.py; manual only, it calls the paid API.
+-->
+<evaluation>
+  <qa_pair>
+    <question>How much was spent on groceries in September 2026? Give pounds and pence, e.g. 123.45.</question>
+    <answer>631.95</answer>
+  </qa_pair>
+  <qa_pair>
+    <question>What was the largest purchase in October 2026 from a merchant never paid before? Give the merchant name as the ledger shows it.</question>
+    <answer>APPLE STORE</answer>
+  </qa_pair>
+  <qa_pair>
+    <question>How much did the September 2026 trip to Porto cost in total, including anything booked ahead of it? Give pounds and pence.</question>
+    <answer>834.97</answer>
+  </qa_pair>
+  <qa_pair>
+    <question>Between April and September 2026, which month had the highest spending? Answer as YYYY-MM.</question>
+    <answer>2026-09</answer>
+  </qa_pair>
+  <qa_pair>
+    <question>Money was lent to someone in August 2026. What reason is noted on that payment? Quote the note exactly.</question>
+    <answer>lent for a deposit</answer>
+  </qa_pair>
+  <qa_pair>
+    <question>One account's data has not synced recently. How many entries does that account hold?</question>
+    <answer>9</answer>
+  </qa_pair>
+  <qa_pair>
+    <question>By how many percent did grocery spending in September 2026 differ from the usual for that category? Answer as a signed whole number, e.g. +12 or -7.</question>
+    <answer>+31</answer>
+  </qa_pair>
+  <qa_pair>
+    <question>How much salary was received in the third quarter of 2026? Give whole pounds.</question>
+    <answer>12600</answer>
+  </qa_pair>
+  <qa_pair>
+    <question>In September 2026, more was spent at one of PRET A MANGER and DISHOOM than at the other, counting only payments that were not reversed. Which one?</question>
+    <answer>DISHOOM</answer>
+  </qa_pair>
+  <qa_pair>
+    <question>One payment is still pending. What is its amount in pounds and pence, ignoring the sign?</question>
+    <answer>45.20</answer>
+  </qa_pair>
+</evaluation>

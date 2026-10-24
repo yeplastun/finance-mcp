@@ -1,0 +1,43 @@
+# Example system unit for serving the MCP over HTTP behind a reverse proxy (Caddy, nginx).
+# Assumes the code in /opt/finance-mcp/mcp with `uv sync` run there, an OS user and database
+# role `finmcp` (peer auth over the Unix socket; grants in deploy/finance.sql), and the OAuth
+# settings in a root-only env file. EnvironmentFile= wins over Environment=, so don't repeat these.
+[Unit]
+Description=finance-mcp: MCP over the finance ledger
+After=network-online.target postgresql.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=finmcp
+Group=finmcp
+WorkingDirectory=/var/lib/finance-mcp
+EnvironmentFile=/etc/finance-mcp.env
+Environment=PYTHONPATH=/opt/finance-mcp/mcp/src HOME=/var/lib/finance-mcp PORT=8789
+Environment=FINANCE_DSN="host=/var/run/postgresql dbname=finance"
+ExecStart=/opt/finance-mcp/mcp/.venv/bin/python -m finance_mcp
+Restart=always
+RestartSec=5
+
+# One line per record in the journal, no banner, no update check on start.
+Environment=FASTMCP_ENABLE_RICH_LOGGING=false FASTMCP_SHOW_SERVER_BANNER=false FASTMCP_CHECK_FOR_UPDATES=off
+
+# The OAuth store (issued tokens, client registrations) lives outside the code directory.
+StateDirectory=finance-mcp
+StateDirectoryMode=0700
+Environment=FASTMCP_HOME=/var/lib/finance-mcp/fastmcp
+
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+LockPersonality=true
+
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,12 @@
+# User unit: collect every connected bank, then update the ledger. Assumes this repo in ~/finance-mcp.
+# Install: cp deploy/finance-sync.* ~/.config/systemd/user/ && systemctl --user enable --now finance-sync.timer
+[Unit]
+Description=finance: bank transactions into the ledger
+
+[Service]
+Type=oneshot
+WorkingDirectory=%h/finance-mcp/finance
+ExecStart=%h/finance-mcp/finance/.venv/bin/python -m finance sync
+TimeoutStartSec=30min
+MemoryMax=300M
+Nice=10

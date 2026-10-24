@@ -1,0 +1,94 @@
+# Example ledger config. Copy to state/ledger.toml (never commit yours: it names people) and run
+#   uv run python -m finance ledger
+
+# Uncategorised card spend whose address or description matches happened abroad -> Travel (any case).
+abroad = "AMOUNT IN (?!GBP)|TOKYO|PARIS"
+
+# Spending in these categories never counts towards a trip, even on trip days.
+not_trip = ["Rent", "Utilities", "Subscriptions & software"]
+
+# Your own notes on people and money arrangements; the finance MCP serves them to chats (finance_notes).
+notes = """
+Anna is a friend: we share dinners and trips.
+"""
+
+# Rules match "MERCHANT|DESCRIPTION|PROVIDER_CATEGORY" (upper case); the first match wins.
+# Optional: direction = "in" | "out", min / max = absolute amount in £, tags = [...].
+[[rule]]
+flow = "transfer"
+category = "Pot move"
+match = '\|UK_RETAIL_POT$'
+
+[[rule]]
+flow = "transfer"
+category = "Card payment"
+match = "AMERICAN EXP|PAYMENT RECEIVED"
+
+[[rule]]
+flow = "income"
+category = "Salary"
+match = "EMPLOYER LTD"
+direction = "in"
+
+[[rule]]
+flow = "housing"
+category = "Rent"
+match = "LETTING AGENT"
+
+[[rule]]
+flow = "spend"
+category = "Groceries"
+match = "TESCO|WAITROSE|SAINSBURY"
+
+# Category groups: each sums its categories in totals (finance_breakdown by="group"); a category in no group
+# stands alone.
+[groups]
+"Home" = ["Rent", "Utilities"]
+"Food" = ["Groceries", "Eating out & coffee"]
+
+# Whose spending a category is by default: joint or personal (anything not listed). A trip with joint = true
+# makes its spending joint; finance_label(whose=...) decides single entries and merchants.
+[whose]
+joint = ["Rent", "Utilities", "Groceries"]
+
+# The same on Saturdays and Sundays off trips, before the line above: eating out at the weekend is together.
+[whose.weekends]
+joint = ["Eating out & coffee"]
+
+# Variants of one merchant -> one name (regex over the upper-case merchant; first match wins).
+[merchant_names]
+'^GOOGLE ?\*?CLOUD' = "GOOGLE CLOUD"
+
+# Merchant -> category when no rule matched.
+[merchants]
+"GOOGLE CLOUD" = "Subscriptions & software"
+
+# What a trip transaction was for: regex over the merchant, first match wins; then [category_kinds].
+[trip_kinds]
+"Flights & long-distance" = "AIRWAYS|AIRLINES|EASYJET|RYANAIR|EUROSTAR"
+"Accommodation" = "BOOKING\\.COM|AIRBNB|HOTEL"
+
+[category_kinds]
+"Groceries" = "Groceries"
+
+[[trip]]
+name = "2026-07 Beach holiday"
+from = 2026-07-10
+to = 2026-07-15
+purpose = "holiday"
+joint = true  # together: its spending is joint
+
+# In the UK: no day after return, and travel booked ahead goes to the next trip abroad.
+[[trip]]
+name = "2026-08 Weekend away"
+from = 2026-08-01
+to = 2026-08-02
+domestic = true
+
+# A manual answer for booked transactions: day + merchant prefix + amount (negative = money out).
+# Fields: trip ("" = not part of a trip), trip_kind, flow, category, tags, note, count (default 1).
+[[override]]
+day = 2026-05-01
+merchant = "BOOKING.COM"
+amount = "-300.00"
+trip = "2026-07 Beach holiday"
